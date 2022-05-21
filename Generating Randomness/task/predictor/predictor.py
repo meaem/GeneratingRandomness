@@ -52,6 +52,9 @@ def predict(test, stats):
 
 def main():
     user_str = ""
+    balance = 1000
+    print("Please give AI some data to learn...")
+    print(f"Current data length is 0, {LEAST_LENGTH - len(user_str)} symbols left")
     while len(user_str) < LEAST_LENGTH:
         print('Print a random string containing 0 or 1:')
         s = input()
@@ -59,23 +62,36 @@ def main():
         if LEAST_LENGTH - len(user_str) > 0:
             print(f"Current data length is {len(s)}, {LEAST_LENGTH - len(user_str)} symbols left")
     print(f"Final data string:\n{user_str}")
+
     stats = {}
     for x in ['0', '1']:
         for y in ['0', '1']:
             for z in ['0', '1']:
                 pattern = f"{x}{y}{z}"
                 zero_after, one_after = count_pattern(user_str, pattern)
-                print(f"{pattern}: {zero_after},{one_after}")
+                # print(f"{pattern}: {zero_after},{one_after}")
                 stats[pattern] = (zero_after, one_after)
-    print("Please enter a test string containing 0 or 1:")
-    test_str = clean_str(input())
-    pridication_str = predict(test_str, stats)
-    print(f"prediction:\n{pridication_str}")
-    correct = count_correct(test_str[3:], pridication_str[3:])
-    print(
-        f"Computer guessed right {correct} out of {len(test_str[3:])} symbols ({100 * correct / len(test_str[3:]):.2f} %)")
+    print(f"""You have ${balance}. Every time the system successfully predicts your next press, you lose $1.
+    Otherwise, you earn $1. Print "enough" to leave the game. Let's go!""")
+    test_str = ""
+    while True:
+        print("Print a random string containing 0 or 1:")
+        test_str = input()
+        if test_str == "enough":
+            break
+        test_str = clean_str(test_str)
+        if len(test_str) < 3 :
+            continue
+        pridication_str = predict(test_str, stats)
+        print(f"prediction:\n{pridication_str}")
 
-
+        correct = count_correct(test_str[3:], pridication_str[3:])
+        wrong = len(test_str[3:]) - correct
+        print(
+            f"Computer guessed right {correct} out of {len(test_str[3:])} symbols ({100 * correct / len(test_str[3:]):.2f} %)")
+        balance -= (correct - wrong)
+        print(f"Your balance is now ${balance}")
+    print("Game over!")
 # print(max((5, 8)))
 main()
 # 0010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101
